@@ -64,6 +64,7 @@ namespace TowersUI
                 WriteLine("Options: ");
                 WriteLine("- M - Solve the puzzle manually");
                 WriteLine("- A - Auto - solve");
+                WriteLine("- S – Auto-solve step-by-step");
                 WriteLine();
                 WriteLine();
                 Write("Choose an approach: ");
@@ -73,30 +74,55 @@ namespace TowersUI
                 {
                     return Play(myTowers);
                 }
-                else if (input == "A")
+                else if (input == "A" || input == "S")
                 {
                     Console.Clear();
                     DisplayTowers(myTowers);
                     WriteLine();
-                    WriteLine("Press a key and watch closely!");
+                    if (input == "A")
+                    {
+                        WriteLine("Press a key and watch closely!");
+                    }
+                    else
+                    {
+                        WriteLine("Press a key to see the first move.");
+                    }
                     ReadKey();
-                    return AutoPlay(myTowers);
+                    return AutoPlay(myTowers, input);
                 }
                 else
                 {
-                    WriteLine("Invalid value. Valid values: 'M', or 'A' ");
+                    WriteLine("Invalid value. Valid values: 'M', 'A, 'or 'S' ");
                 }
             } while (input != "M" && input != "A");
             return -1;
         }
 
-        private static int AutoPlay(Towers myTowers)
+        private static int AutoPlay(Towers myTowers, string input)
         {
             int from = 1;
             int to = 3;
             int other = 2;
+            string algorithm = input;
 
-            AutoMove(myTowers, myTowers.NumberOfDiscs, from, to, other);
+            if (algorithm == "A")
+            {
+                Recursive(myTowers, myTowers.NumberOfDiscs, from, to, other);
+            }
+            else
+            {
+                Iterative(myTowers, myTowers.NumberOfDiscs, from, to, other);
+                WriteLine();
+                WriteLine();
+                if (myTowers.IsComplete == false)
+                {
+                    Write("Step-through aborted. ");
+                }
+                else
+                {
+                    Write("Step-through completed. ");
+                }
+            }
             WriteLine($"Number of moves: {myTowers.NumberOfMoves}");
             WriteLine();
             WriteLine();
@@ -108,7 +134,75 @@ namespace TowersUI
             return AskForPlayAgain();
         }
 
-        private static void AutoMove(Towers myTowers, int n, int from, int to, int other)
+        private static void Iterative(Towers myTowers, int numberOfDiscs, int from, int to, int other)
+        {
+            MoveRecord theRecord;
+            int temp;
+
+            if (numberOfDiscs % 2 == 0)
+            {
+                temp = to;
+                to = other;
+                other = temp;
+            }
+            for (int i = 1; i <= myTowers.MinimumPossibleMoves; i++)
+            {
+                if (i % 3 == 1)
+                {
+                    try
+                    {
+                        theRecord = myTowers.Move(from, to);
+                    }
+                    catch (InvalidMoveException e)
+                    {
+
+                        theRecord = myTowers.Move(to, from);
+                    }
+                    myRecord.Enqueue(theRecord);
+                }
+                else if (i % 3 == 2)
+                {
+                    try
+                    {
+                        theRecord = myTowers.Move(from, other);
+                    }
+                    catch (InvalidMoveException e)
+                    {
+
+                        theRecord = myTowers.Move(other, from);
+                    }
+                    myRecord.Enqueue(theRecord);
+                }
+                else if (i % 3 == 0)
+                {
+                    try
+                    {
+                        theRecord = myTowers.Move(to, other);
+                    }
+                    catch (InvalidMoveException e)
+                    {
+
+                        theRecord = myTowers.Move(other, to);
+                    }
+                    myRecord.Enqueue(theRecord);
+                }
+
+                Console.Clear();
+                DisplayTowers(myTowers);
+                WriteLine($"\nMove {myTowers.NumberOfMoves} complete. Successfully moved disc from pole {from} to pole {to}");
+                if (myTowers.IsComplete == false)
+                {
+                    WriteLine();
+                    Write("Press any key to move to the next step or \"x\" to exit. ");
+                    if (ReadKey().KeyChar.ToString().ToUpper() == "X")
+                    {
+                        break;
+                    }
+                }                             
+            }
+        }
+
+        private static void Recursive(Towers myTowers, int n, int from, int to, int other)
         {
             MoveRecord theRecord;
             if (n == 1)
@@ -117,19 +211,19 @@ namespace TowersUI
                 myRecord.Enqueue(theRecord);
                 Console.Clear();
                 DisplayTowers(myTowers);
-                WriteLine($"\nMove {myTowers.NumberOfMoves} complete. Successfully moved disc from tower {from} to tower {to}");
+                WriteLine($"\nMove {myTowers.NumberOfMoves} complete. Successfully moved disc from pole {from} to pole {to}");
                 Thread.Sleep(250);
                 return;
             }
 
-            AutoMove(myTowers, n - 1, from, other, to);
+            Recursive(myTowers, n - 1, from, other, to);
             theRecord = myTowers.Move(from, to);
             myRecord.Enqueue(theRecord);
             Console.Clear();
             DisplayTowers(myTowers);
-            WriteLine($"\nMove {myTowers.NumberOfMoves} complete. Successfully moved disc from tower {from} to tower {to}");
+            WriteLine($"\nMove {myTowers.NumberOfMoves} complete. Successfully moved disc from pole {from} to pole {to}");
             Thread.Sleep(250);
-            AutoMove(myTowers, n - 1, other, to , from);
+            Recursive(myTowers, n - 1, other, to , from);
         }
 
         // status: return 2 when the move is complete (the user presses enter for 'To' tower to cancel, undo or redo the move)  
@@ -244,7 +338,7 @@ namespace TowersUI
                 myRecord.Enqueue(myTowers.Move(theRecord.From, theRecord.To));
                 Console.Clear();
                 DisplayTowers(myTowers);
-                WriteLine($"\nMove {myTowers.NumberOfMoves} complete by redo of move {theRecord.MoveNumber}. Disc {theRecord.Disc} returned to tower {theRecord.To} from tower {theRecord.From}");
+                WriteLine($"\nMove {myTowers.NumberOfMoves} complete by redo of move {theRecord.MoveNumber}. Disc {theRecord.Disc} returned to pole {theRecord.To} from pole {theRecord.From}");
             }
         }
 
@@ -261,7 +355,7 @@ namespace TowersUI
                 myRecord.Enqueue(myTowers.Move(theRecord.To, theRecord.From));
                 Console.Clear();
                 DisplayTowers(myTowers);
-                WriteLine($"\nMove {myTowers.NumberOfMoves} complete by undo of move {theRecord.MoveNumber}. Disc {theRecord.Disc} restored to tower {theRecord.From} from tower {theRecord.To}");
+                WriteLine($"\nMove {myTowers.NumberOfMoves} complete by undo of move {theRecord.MoveNumber}. Disc {theRecord.Disc} restored to pole {theRecord.From} from pole {theRecord.To}");
             }
         }
 
@@ -296,7 +390,7 @@ namespace TowersUI
                         redoRecord.Clear();
                         Console.Clear();
                         DisplayTowers(myTowers);
-                        WriteLine($"\nMove {myTowers.NumberOfMoves} complete. Successfully moved disc from tower {from} to tower {to}");
+                        WriteLine($"\nMove {myTowers.NumberOfMoves} complete. Successfully moved disc from pole {from} to pole {to}");
                     }
                     catch (InvalidMoveException e)
                     {
@@ -423,7 +517,7 @@ namespace TowersUI
                     while (myRecord.Count > 0)
                     {
                         theRecord = myRecord.Dequeue();
-                        WriteLine($" {theRecord.MoveNumber}. Disc {theRecord.Disc} moved from tower {theRecord.From} to tower {theRecord.To}.");
+                        WriteLine($" {theRecord.MoveNumber}. Disc {theRecord.Disc} moved from pole {theRecord.From} to pole {theRecord.To}.");
                     }
                 }
                 else if (input != "Y" && input != "N")
@@ -443,6 +537,7 @@ namespace TowersUI
 
             do
             {
+                WriteLine();
                 Write("How many discs in your tower (default is 5, max is 9): ");
                 input = ReadKey().KeyChar.ToString();
                 WriteLine();
