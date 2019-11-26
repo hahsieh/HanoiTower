@@ -14,6 +14,15 @@ public class Towers
     public bool IsComplete { get; private set; }
 
     public int MinimumPossibleMoves { get; set; }
+    public Towers(Towers copied)
+    {
+        this.threePoles = copied.threePoles;
+        this.thePole = copied.thePole;
+        this.NumberOfDiscs = copied.NumberOfDiscs;
+        this.NumberOfMoves = copied.NumberOfMoves;
+        this.IsComplete = copied.IsComplete;
+        this.MinimumPossibleMoves = copied.MinimumPossibleMoves;
+    }
     public Towers(int numberOfDiscs)
     {
         if (numberOfDiscs > 0 && numberOfDiscs < 10)
@@ -71,7 +80,7 @@ public class Towers
             theDisc = threePoles[from - 1].Pop();
             threePoles[to - 1].Push(theDisc);
             NumberOfMoves++;
-            theRecord = new MoveRecord(NumberOfMoves, theDisc, from, to);
+            theRecord = new MoveRecord(NumberOfMoves, theDisc, from, to, new Towers(this));
             if (threePoles[0].Count == 0 && threePoles[1].Count == 0)
             {
                 IsComplete = true;

@@ -9,6 +9,7 @@ namespace TowersUI
 {
     class Program
     {
+        static AVL<int, MoveRecord> moves = new AVL<int, MoveRecord> { };
         static readonly Queue<MoveRecord> myRecord = new Queue<MoveRecord> { };
         static readonly Stack<MoveRecord> undoRecord = new Stack<MoveRecord> { };
         static readonly Stack<MoveRecord> redoRecord = new Stack<MoveRecord> { };
@@ -17,7 +18,7 @@ namespace TowersUI
 
         static void Main(string[] args)
         {
-            Towers myTowers;            
+            Towers myTowers;
             int mode;
 
             GetTower(out myTowers);
@@ -26,7 +27,7 @@ namespace TowersUI
             DisplayTowers(myTowers);
 
             mode = SolveOption(myTowers);
-                                    
+
             while (mode != 0)
             {
                 myRecord.Clear();
@@ -35,7 +36,7 @@ namespace TowersUI
                 if (mode == 1)
                 {
                     Console.Clear();
-                    GetTower(out myTowers);                    
+                    GetTower(out myTowers);
                 }
                 else if (mode == 2)
                 {
@@ -43,7 +44,7 @@ namespace TowersUI
                 }
                 Console.Clear();
                 DisplayTowers(myTowers);
-                mode = SolveOption(myTowers); 
+                mode = SolveOption(myTowers);
             }
 
             WriteLine();
@@ -125,9 +126,8 @@ namespace TowersUI
             }
             WriteLine($"Number of moves: {myTowers.NumberOfMoves}");
             WriteLine();
-            WriteLine();
-
-            ListRecord();
+            
+            PostGameReview();
             WriteLine();
             WriteLine();
 
@@ -198,7 +198,7 @@ namespace TowersUI
                     {
                         break;
                     }
-                }                             
+                }
             }
         }
 
@@ -207,7 +207,7 @@ namespace TowersUI
             MoveRecord theRecord;
             if (n == 1)
             {
-                theRecord = myTowers.Move(from,to);
+                theRecord = myTowers.Move(from, to);
                 myRecord.Enqueue(theRecord);
                 Console.Clear();
                 DisplayTowers(myTowers);
@@ -223,7 +223,7 @@ namespace TowersUI
             DisplayTowers(myTowers);
             WriteLine($"\nMove {myTowers.NumberOfMoves} complete. Successfully moved disc from pole {from} to pole {to}");
             Thread.Sleep(250);
-            Recursive(myTowers, n - 1, other, to , from);
+            Recursive(myTowers, n - 1, other, to, from);
         }
 
         // status: return 2 when the move is complete (the user presses enter for 'To' tower to cancel, undo or redo the move)  
@@ -237,7 +237,7 @@ namespace TowersUI
             bool foundTo;
             string fromInput;
             string toInput;
-            Regex myRegex = new Regex(@"^[0-9]"); 
+            Regex myRegex = new Regex(@"^[0-9]");
 
             do
             {
@@ -359,11 +359,11 @@ namespace TowersUI
             }
         }
 
-        
+
         private static int Play(Towers myTowers)
         {
             int status;
-            MoveRecord theRecord;            
+            MoveRecord theRecord;
 
             do
             {
@@ -386,6 +386,7 @@ namespace TowersUI
                     {
                         theRecord = myTowers.Move(from, to);
                         myRecord.Enqueue(theRecord);
+                        moves.Insert(myTowers.NumberOfMoves, theRecord);
                         undoRecord.Push(theRecord);
                         redoRecord.Clear();
                         Console.Clear();
@@ -414,9 +415,8 @@ namespace TowersUI
                 {
                     WriteLine("Congrats! That's the minimum!");
                     WriteLine();
-                    WriteLine();
-
-                    ListRecord();
+                    
+                    PostGameReview();
                     WriteLine();
                     WriteLine();
 
@@ -427,9 +427,8 @@ namespace TowersUI
                     // ask if the user want to try to solve the same problem again in the fewest possible moves.
                     WriteLine($"Not bad, but it can be done in {myTowers.MinimumPossibleMoves}.");
                     WriteLine();
-                    WriteLine();
-
-                    ListRecord();
+                    
+                    PostGameReview();
                     WriteLine();
                     WriteLine();
 
@@ -448,7 +447,7 @@ namespace TowersUI
                             WriteLine("Invalid value. Valid values: 'Y', or 'N'");
                             WriteLine();
                         }
-                    } while (input != "Y" && input != "N"); 
+                    } while (input != "Y" && input != "N");
 
                     WriteLine();
                     WriteLine();
@@ -462,14 +461,46 @@ namespace TowersUI
                 if (myRecord.Count != 0)
                 {
                     WriteLine();
-                    WriteLine();
-                    ListRecord();
+                    
+                    PostGameReview();
                 }
                 WriteLine();
                 WriteLine();
 
                 return AskForPlayAgain();
             }
+        }
+
+        private static void PostGameReview()
+        {
+            string input;            
+
+            do
+            {
+                WriteLine(); 
+                WriteLine("Post-game review:");
+                WriteLine("- L – List moves");
+                WriteLine("- R - Replay");
+                WriteLine("- B – Replay backwards");
+                WriteLine("- F – Find result of a specific move");
+                WriteLine("- X – Exit post-game review");
+                Write("Choose an approach: ");
+                input = ReadKey().KeyChar.ToString().ToUpper();
+                WriteLine();
+                switch (input)
+                {
+                    case "L":
+                        WriteLine();
+                        moves.Traverse(ListRecord);                        
+                        break;
+                    case "X":
+                        break;
+                    default:
+                        WriteLine("Invalid command.");
+                        break;
+                }
+            } while (input != "X");
+
         }
 
         private static int AskForPlayAgain()
@@ -500,33 +531,9 @@ namespace TowersUI
             return -1;
         }
 
-        private static void ListRecord()
+        private static void ListRecord(MoveRecord theRecord)
         {
-            string input;
-            MoveRecord theRecord;
-
-            do
-            {
-                Write("Would you like to see a list of the moves you made? (Y or N): ");
-                input = ReadKey().KeyChar.ToString().ToUpper();
-                WriteLine();
-
-                if (input == "Y")
-                {
-                    WriteLine();
-                    while (myRecord.Count > 0)
-                    {
-                        theRecord = myRecord.Dequeue();
-                        WriteLine($" {theRecord.MoveNumber}. Disc {theRecord.Disc} moved from pole {theRecord.From} to pole {theRecord.To}.");
-                    }
-                }
-                else if (input != "Y" && input != "N")
-                {
-                    WriteLine("Invalid value. Valid values: 'Y', or 'N'");
-                    WriteLine();
-                }
-            } while (input != "Y" && input != "N");
-
+            WriteLine($" {theRecord.MoveNumber}. Disc {theRecord.Disc} moved from pole {theRecord.From} to pole {theRecord.To}.");
         }
 
         static void GetTower(out Towers myTowers)
@@ -547,7 +554,7 @@ namespace TowersUI
                     done = true;
                     WriteLine("Number of discs defaulting to 5. Press any key to continue. ");
                     ReadKey();
-                    myTowers = new Towers(5);                    
+                    myTowers = new Towers(5);
                 }
                 else
                 {
