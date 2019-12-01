@@ -9,7 +9,7 @@ namespace TowersUI
 {
     class Program
     {
-        static AVL<int, MoveRecord> moves = new AVL<int, MoveRecord> { };
+        static readonly AVL<int, MoveRecord> moves = new AVL<int, MoveRecord> { };          // ??
         static readonly Queue<MoveRecord> myRecord = new Queue<MoveRecord> { };
         static readonly Stack<MoveRecord> undoRecord = new Stack<MoveRecord> { };
         static readonly Stack<MoveRecord> redoRecord = new Stack<MoveRecord> { };
@@ -30,7 +30,8 @@ namespace TowersUI
 
             while (mode != 0)
             {
-                myRecord.Clear();
+                //myRecord.Clear();
+                moves.Clear();
                 undoRecord.Clear();
                 redoRecord.Clear();
                 if (mode == 1)
@@ -136,7 +137,7 @@ namespace TowersUI
 
         private static void Iterative(Towers myTowers, int numberOfDiscs, int from, int to, int other)
         {
-            MoveRecord theRecord;
+            MoveRecord theRecord = null;
             int temp;
 
             if (numberOfDiscs % 2 == 0)
@@ -158,7 +159,8 @@ namespace TowersUI
 
                         theRecord = myTowers.Move(to, from);
                     }
-                    myRecord.Enqueue(theRecord);
+                    // myRecord.Enqueue(theRecord);
+                    moves.Insert(myTowers.NumberOfMoves, theRecord);
                 }
                 else if (i % 3 == 2)
                 {
@@ -171,7 +173,8 @@ namespace TowersUI
 
                         theRecord = myTowers.Move(other, from);
                     }
-                    myRecord.Enqueue(theRecord);
+                    // myRecord.Enqueue(theRecord);
+                    moves.Insert(myTowers.NumberOfMoves, theRecord);
                 }
                 else if (i % 3 == 0)
                 {
@@ -184,12 +187,13 @@ namespace TowersUI
 
                         theRecord = myTowers.Move(other, to);
                     }
-                    myRecord.Enqueue(theRecord);
+                    // myRecord.Enqueue(theRecord);
+                    moves.Insert(myTowers.NumberOfMoves, theRecord);
                 }
 
                 Console.Clear();
                 DisplayTowers(myTowers);
-                WriteLine($"\nMove {myTowers.NumberOfMoves} complete. Successfully moved disc from pole {from} to pole {to}");
+                WriteLine($"\nMove {myTowers.NumberOfMoves} complete. Successfully moved disc from pole {theRecord.From} to pole {theRecord.To}");
                 if (myTowers.IsComplete == false)
                 {
                     WriteLine();
@@ -208,7 +212,8 @@ namespace TowersUI
             if (n == 1)
             {
                 theRecord = myTowers.Move(from, to);
-                myRecord.Enqueue(theRecord);
+                //myRecord.Enqueue(theRecord);
+                moves.Insert(myTowers.NumberOfMoves, theRecord);
                 Console.Clear();
                 DisplayTowers(myTowers);
                 WriteLine($"\nMove {myTowers.NumberOfMoves} complete. Successfully moved disc from pole {from} to pole {to}");
@@ -218,7 +223,8 @@ namespace TowersUI
 
             Recursive(myTowers, n - 1, from, other, to);
             theRecord = myTowers.Move(from, to);
-            myRecord.Enqueue(theRecord);
+            //myRecord.Enqueue(theRecord);
+            moves.Insert(myTowers.NumberOfMoves, theRecord);
             Console.Clear();
             DisplayTowers(myTowers);
             WriteLine($"\nMove {myTowers.NumberOfMoves} complete. Successfully moved disc from pole {from} to pole {to}");
@@ -327,15 +333,19 @@ namespace TowersUI
 
         private static void Redo(Towers myTowers)
         {
+            MoveRecord theRecord;
+            MoveRecord nextRecord;
             if (redoRecord.Count == 0)
             {
                 WriteLine("Invalid value. Valid values for 'From': '1', '2', '3', 'Ctrl-z', or 'x' ");
             }
             else
             {
-                MoveRecord theRecord = redoRecord.Pop();
+                theRecord = redoRecord.Pop();
                 undoRecord.Push(theRecord);
-                myRecord.Enqueue(myTowers.Move(theRecord.From, theRecord.To));
+                //myRecord.Enqueue(myTowers.Move(theRecord.From, theRecord.To));
+                nextRecord = myTowers.Move(theRecord.From, theRecord.To);
+                moves.Insert(myTowers.NumberOfMoves, nextRecord);
                 Console.Clear();
                 DisplayTowers(myTowers);
                 WriteLine($"\nMove {myTowers.NumberOfMoves} complete by redo of move {theRecord.MoveNumber}. Disc {theRecord.Disc} returned to pole {theRecord.To} from pole {theRecord.From}");
@@ -344,15 +354,19 @@ namespace TowersUI
 
         private static void Undo(Towers myTowers)
         {
+            MoveRecord theRecord;
+            MoveRecord nextRecord; 
             if (undoRecord.Count == 0)
             {
                 WriteLine("Can’t undo");
             }
             else
             {
-                MoveRecord theRecord = undoRecord.Pop();
+                theRecord = undoRecord.Pop();
                 redoRecord.Push(theRecord);
-                myRecord.Enqueue(myTowers.Move(theRecord.To, theRecord.From));
+                //myRecord.Enqueue(myTowers.Move(theRecord.To, theRecord.From));
+                nextRecord = myTowers.Move(theRecord.To, theRecord.From);
+                moves.Insert(myTowers.NumberOfMoves, nextRecord);
                 Console.Clear();
                 DisplayTowers(myTowers);
                 WriteLine($"\nMove {myTowers.NumberOfMoves} complete by undo of move {theRecord.MoveNumber}. Disc {theRecord.Disc} restored to pole {theRecord.From} from pole {theRecord.To}");
@@ -385,8 +399,8 @@ namespace TowersUI
                     try
                     {
                         theRecord = myTowers.Move(from, to);
-                        myRecord.Enqueue(theRecord);
-                        moves.Insert(myTowers.NumberOfMoves, theRecord);
+                        //myRecord.Enqueue(theRecord);
+                        moves.Insert(myTowers.NumberOfMoves, theRecord);    // theRecord.MoveNumber
                         undoRecord.Push(theRecord);
                         redoRecord.Clear();
                         Console.Clear();
@@ -458,7 +472,7 @@ namespace TowersUI
             }
             else
             {
-                if (myRecord.Count != 0)
+                if (moves.Root != null)
                 {
                     WriteLine();
                     

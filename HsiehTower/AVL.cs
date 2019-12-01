@@ -9,6 +9,7 @@ public class AVL<TKey, TValue> where TKey : IComparable  // whatever data type i
         public TValue Value;
         public Node Left;
         public Node Right;
+
     }
 
     internal Node Root;
@@ -16,6 +17,11 @@ public class AVL<TKey, TValue> where TKey : IComparable  // whatever data type i
     public delegate void DisplayDel(TValue value);
 
     public AVL()
+    {
+        Root = null;
+    }
+
+    public void Clear()
     {
         Root = null;
     }
@@ -136,8 +142,10 @@ public class AVL<TKey, TValue> where TKey : IComparable  // whatever data type i
     {
         if (node == null) return;
         Traverse(node.Left, method);
+        node.Left = null;
         method(node.Value);
         Traverse(node.Right, method);
+        node.Right = null;
     }
 
     private void TraverseReverse(Node node, DisplayDel method)
