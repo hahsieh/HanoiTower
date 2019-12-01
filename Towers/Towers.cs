@@ -6,7 +6,7 @@ public class Towers
 {
     private readonly Stack<int>[] threePoles = new Stack<int>[3];
 
-    private readonly Stack<int> thePole = new Stack<int>();
+    // private readonly Stack<int> thePole = new Stack<int>();
     public int NumberOfDiscs { get; private set; }
     public int NumberOfMoves { get; private set; }
 
@@ -16,8 +16,16 @@ public class Towers
     public int MinimumPossibleMoves { get; set; }
     public Towers(Towers copied)
     {
-        this.threePoles = copied.threePoles;
-        this.thePole = copied.thePole;
+        this.threePoles = new Stack<int>[3];           // ref data type
+        this.threePoles[0] = new Stack<int>();
+        for (int i = 0; i < 3; ++i)
+        {
+            this.threePoles[i] = new Stack<int>(copied.threePoles[i]);        // FILO
+            this.threePoles[i] = new Stack<int>(this.threePoles[i]);
+        }
+        
+        // copied.threePoles.Clone();
+        // this.thePole = copied.thePole;
         this.NumberOfDiscs = copied.NumberOfDiscs;
         this.NumberOfMoves = copied.NumberOfMoves;
         this.IsComplete = copied.IsComplete;
@@ -35,11 +43,11 @@ public class Towers
             }
             threePoles[1] = new Stack<int>();
             threePoles[2] = new Stack<int>();
-            thePole = new Stack<int>();
-            for (int i = numberOfDiscs; i > 0; i--)
-            {
-                thePole.Push(i);
-            }
+            // thePole = new Stack<int>();
+            //for (int i = numberOfDiscs; i > 0; i--)
+            //{
+            //    thePole.Push(i);
+            //}
             NumberOfMoves = 0;
             IsComplete = false;
             MinimumPossibleMoves = (int)Math.Pow(2, NumberOfDiscs) - 1;

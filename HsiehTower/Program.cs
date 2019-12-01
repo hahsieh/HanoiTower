@@ -487,7 +487,10 @@ namespace TowersUI
 
         private static void PostGameReview()
         {
-            string input;            
+            string input;
+            int moveNum = 0;
+            bool done = false;
+            MoveRecord theRecord = null;
 
             do
             {
@@ -507,6 +510,40 @@ namespace TowersUI
                         WriteLine();
                         moves.Traverse(ListRecord);                        
                         break;
+                    case "R":
+                        WriteLine();
+                        moves.Traverse(Replay);
+                        break;
+                    case "F":
+                        WriteLine();
+                        do
+                        {
+                            Write("Enter the number of the move: ");
+                            if (Int32.TryParse(ReadKey().KeyChar.ToString(), out moveNum))
+                            {
+                                done = true; 
+                                WriteLine();
+                                theRecord = moves.Find(moveNum);
+                                if (theRecord == null)
+                                {
+                                    WriteLine("No such move.");
+                                }
+                                else
+                                {
+                                    Console.Clear();
+                                    DisplayTowers(theRecord.TowerState);
+                                    WriteLine();
+                                    WriteLine($"In move {theRecord.MoveNumber}, disc {theRecord.Disc} was moved from pole {theRecord.From} to pole {theRecord.To}.");
+                                }
+                            }
+                            else
+                            {
+                                WriteLine();
+                                WriteLine("Invalid value. Values should be integers.");
+                            }
+                        } while (!done); 
+                        
+                        break;
                     case "X":
                         break;
                     default:
@@ -516,6 +553,8 @@ namespace TowersUI
             } while (input != "X");
 
         }
+
+       
 
         private static int AskForPlayAgain()
         {
@@ -545,6 +584,10 @@ namespace TowersUI
             return -1;
         }
 
+        private static void Replay(MoveRecord theRecord)
+        {
+            WriteLine($" {theRecord.MoveNumber}. Disc {theRecord.Disc} moved from pole {theRecord.From} to pole {theRecord.To}.");
+        }
         private static void ListRecord(MoveRecord theRecord)
         {
             WriteLine($" {theRecord.MoveNumber}. Disc {theRecord.Disc} moved from pole {theRecord.From} to pole {theRecord.To}.");
