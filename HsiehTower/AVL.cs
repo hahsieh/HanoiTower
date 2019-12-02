@@ -142,18 +142,22 @@ public class AVL<TKey, TValue> where TKey : IComparable  // whatever data type i
     {
         if (node == null) return;
         Traverse(node.Left, method);
-        node.Left = null;
+        //node.Left = null;
         method(node.Value);
         Traverse(node.Right, method);
-        node.Right = null;
+        //node.Right = null;
     }
 
+    public void TraverseReverse(DisplayDel method)
+    {
+        TraverseReverse(Root, method);
+    }
     private void TraverseReverse(Node node, DisplayDel method)
     {
         if (node == null) return;
-        Traverse(node.Right, method);
+        TraverseReverse(node.Right, method);
         method(node.Value);
-        Traverse(node.Left, method);
+        TraverseReverse(node.Left, method);
     }
 
     public TValue Find(int key)
