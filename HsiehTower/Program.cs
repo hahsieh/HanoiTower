@@ -13,7 +13,7 @@ namespace TowersUI
         static readonly Queue<MoveRecord> myRecord = new Queue<MoveRecord> { };
         static readonly Stack<MoveRecord> undoRecord = new Stack<MoveRecord> { };
         static readonly Stack<MoveRecord> redoRecord = new Stack<MoveRecord> { };
-        static MoveRecord initialRecord;
+        //static MoveRecord initialRecord;
         const string CtrlZ = "\u001a";
         const string CtrlY = "\u0019";
 
@@ -23,7 +23,8 @@ namespace TowersUI
             int mode;
 
             GetTower(out myTowers);
-            initialRecord = new MoveRecord(0, 0, 0, 0, new Towers(myTowers));
+            //initialRecord = new MoveRecord(0, 0, 0, 0, new Towers(myTowers));
+            moves.Insert(0, new MoveRecord(0, 0, 0, 0, new Towers(myTowers)));
             
             Console.Clear();
             DisplayTowers(myTowers);
@@ -130,7 +131,7 @@ namespace TowersUI
             WriteLine($"Number of moves: {myTowers.NumberOfMoves}");
             WriteLine();
             
-            PostGameReview();
+            PostGameReview(myTowers);
             WriteLine();
             WriteLine();
 
@@ -375,7 +376,6 @@ namespace TowersUI
             }
         }
 
-
         private static int Play(Towers myTowers)
         {
             int status;
@@ -432,7 +432,7 @@ namespace TowersUI
                     WriteLine("Congrats! That's the minimum!");
                     WriteLine();
                     
-                    PostGameReview();
+                    PostGameReview(myTowers);
                     WriteLine();
                     WriteLine();
 
@@ -444,7 +444,7 @@ namespace TowersUI
                     WriteLine($"Not bad, but it can be done in {myTowers.MinimumPossibleMoves}.");
                     WriteLine();
                     
-                    PostGameReview();
+                    PostGameReview(myTowers);
                     WriteLine();
                     WriteLine();
 
@@ -477,7 +477,7 @@ namespace TowersUI
                 if (moves.Root != null)
                 {
                     WriteLine();
-                    PostGameReview();
+                    PostGameReview(myTowers);
                 }
                 WriteLine();
                 WriteLine();
@@ -486,7 +486,7 @@ namespace TowersUI
             }
         }
 
-        private static void PostGameReview()
+        private static void PostGameReview(Towers myTowers)
         {
             string input;
             int moveNum = 0;
@@ -508,19 +508,24 @@ namespace TowersUI
                 switch (input)
                 {
                     case "L":
+                        Console.Clear();
                         WriteLine();
-                        moves.Traverse(x => WriteLine($" {x.MoveNumber}. Disc {x.Disc} moved from pole {x.From} to pole {x.To}."));                        
+                        moves.Traverse(x =>
+                        {
+                            if (x.MoveNumber == 0) return;
+                            WriteLine($" Move {x.MoveNumber}: Disc {x.Disc} was moved from pole {x.From} to pole {x.To}.");
+                        });                        
                         break;
                     case "R":
-                        Console.Clear();
-                        DisplayTowers(initialRecord.TowerState);
-                        Thread.Sleep(250);
-                        moves.Traverse(Replay);
+                        //Console.Clear();
+                        //DisplayTowers(myTowers.initial.TowerState);
+                        //Thread.Sleep(250);
+                        moves.Traverse(MoveWithStateDisplay);
                         break;
                     case "B":
-                        moves.TraverseReverse(Replay);
-                        Console.Clear();
-                        DisplayTowers(initialRecord.TowerState);
+                        moves.TraverseReverse(MoveWithStateDisplay);
+                        //Console.Clear();
+                        //DisplayTowers(myTowers.initial.TowerState);
                         break;
                     case "F":
                         WriteLine();
@@ -589,19 +594,19 @@ namespace TowersUI
             return -1;
         }
 
-        private static void Replay(MoveRecord theRecord)
+        private static void MoveWithStateDisplay(MoveRecord theRecord)
         {
             Console.Clear();
             DisplayTowers(theRecord.TowerState);
             WriteLine();
-            WriteLine($" {theRecord.MoveNumber}. Disc {theRecord.Disc} moved from pole {theRecord.From} to pole {theRecord.To}.");
+            if (theRecord.MoveNumber == 0)
+            {
+                Thread.Sleep(250);
+                return;
+            } 
+            WriteLine($" Move {theRecord.MoveNumber}: Disc {theRecord.Disc} was moved from pole {theRecord.From} to pole {theRecord.To}.");
             Thread.Sleep(250);
         }
-
-        //private static void ListRecord(MoveRecord theRecord)
-        //{
-        //    WriteLine($" {theRecord.MoveNumber}. Disc {theRecord.Disc} moved from pole {theRecord.From} to pole {theRecord.To}.");
-        //}
 
         static void GetTower(out Towers myTowers)
         {

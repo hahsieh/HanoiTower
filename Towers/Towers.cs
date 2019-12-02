@@ -14,6 +14,8 @@ public class Towers
     public bool IsComplete { get; private set; }
 
     public int MinimumPossibleMoves { get; set; }
+
+    //public MoveRecord initial;
     public Towers(Towers copied)
     {
         this.threePoles = new Stack<int>[3];           // ref data type
@@ -30,6 +32,7 @@ public class Towers
         this.NumberOfMoves = copied.NumberOfMoves;
         this.IsComplete = copied.IsComplete;
         this.MinimumPossibleMoves = copied.MinimumPossibleMoves;
+        //this.initial = new MoveRecord(0, 0, 0, 0, new Towers(this));
     }
     public Towers(int numberOfDiscs)
     {
