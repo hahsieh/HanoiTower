@@ -46,7 +46,7 @@ public class Towers
         }
         else
         {
-            throw new InvalidHeightException("Oops. Number of discs must be greater than 0 and less than 10.");
+            throw new InvalidHeightException("Oops. Number of discs must be greater than 0 and less than 10.");            
         }
     }
 

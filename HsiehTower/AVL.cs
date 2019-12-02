@@ -24,26 +24,28 @@ public class AVL<TKey, TValue> where TKey : IComparable  // whatever data type i
         Root = null;
     }
 
-    public void Insert(TKey Key, TValue Value)
+    public void Insert(TKey key, TValue value)
     {
-        Root = Insert(Root, Key, Value);
+        Root = Insert(Root, key, value);
     }
-    private Node Insert(Node parent, TKey Key, TValue Value)
+    private Node Insert(Node parent, TKey key, TValue value)
     {
         if (parent == null)
         {
-            parent = new Node();
-            parent.Key = Key;
-            parent.Value = Value;
+            parent = new Node()
+            { 
+                Key = key,
+                Value = value
+            };            
         }
-        else if (Key.CompareTo(parent.Key) == -1)
+        else if (key.CompareTo(parent.Key) == -1)
         {
-            parent.Left = Insert(parent.Left, Key, Value);
+            parent.Left = Insert(parent.Left, key, value);
             parent = BalanceTree(parent);
         }
         else
         {
-            parent.Right = Insert(parent.Right, Key, Value);
+            parent.Right = Insert(parent.Right, key, value);
             parent = BalanceTree(parent);
         }
         return parent;
@@ -122,7 +124,7 @@ public class AVL<TKey, TValue> where TKey : IComparable  // whatever data type i
         int r = 0;
         int m = 0;
         if (node == null) return -1;   // Height of a Null node is -1 
-        if (node != null)
+        else
         {
             l = GetHeight(node.Left);
             r = GetHeight(node.Right);
@@ -139,11 +141,9 @@ public class AVL<TKey, TValue> where TKey : IComparable  // whatever data type i
     private void Traverse(Node node, DisplayDel method)
     {
         if (node == null) return;
-        Traverse(node.Left, method);
-        //node.Left = null;
+        Traverse(node.Left, method);        
         method(node.Value);
-        Traverse(node.Right, method);
-        //node.Right = null;
+        Traverse(node.Right, method);       
     }
 
     public void TraverseReverse(DisplayDel method)
@@ -158,6 +158,64 @@ public class AVL<TKey, TValue> where TKey : IComparable  // whatever data type i
         TraverseReverse(node.Left, method);
     }
 
+    public void Delete(TKey key)
+    {
+        Root = Delete(Root, key);
+    }
+
+    private Node Delete(Node node, TKey key)
+    {
+        if (node == null)
+        {
+            return node;
+        }
+        if (key.CompareTo(node.Key) == -1)
+        {
+            node.Left = Delete(node.Left, key);
+            node = BalanceTree(node);
+        }
+        else if (key.CompareTo(node.Key) == 1)
+        {
+            node.Right = Delete(node.Right, key);
+            node = BalanceTree(node);
+        }
+        else
+        {
+            //Case where node has zero or one child.  Just delete it.
+            if (node.Right == null)
+            {
+                node = node.Left;
+                if (node != null) node = BalanceTree(node);
+            }
+            else if (node.Left == null)
+            {
+                node = node.Right;
+                if (node != null) node = BalanceTree(node);
+            }
+            //For a node with two children, you replace the node being deleted with 
+            //the largest node in its smaller (left) subtree.
+            else
+            {
+                node.Key = MaxLeftChildValue(node.Left);
+                node.Left = Delete(node.Left, node.Key);
+                node = BalanceTree(node);
+            }
+        }
+
+        return node;
+    }
+
+    private TKey MaxLeftChildValue(Node node)
+    {
+        TKey maxVal = node.Key;
+        while (node.Right != null)
+        {
+            maxVal = node.Right.Key;
+            node = node.Right;
+        }
+
+        return maxVal;
+    }
     public TValue Find(int key)
     {
         return Find(Root, key);
@@ -176,7 +234,6 @@ public class AVL<TKey, TValue> where TKey : IComparable  // whatever data type i
         }
         else
         {
-
             node = node.Left;
             return Find(node, key);
         }

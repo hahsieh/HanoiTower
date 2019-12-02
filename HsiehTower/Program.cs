@@ -95,7 +95,9 @@ namespace TowersUI
                 }
                 else
                 {
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
                     WriteLine("Invalid value. Valid values: 'M', 'A, 'or 'S' ");
+                    Console.ResetColor();                    
                 }
             } while (input != "M" && input != "A");
             return -1;
@@ -262,7 +264,16 @@ namespace TowersUI
                 {
                     if (from < 1 || from > 3)
                     {
-                        WriteLine("Invalid tower value. Valid values for 'From': '1', '2', '3', 'Ctrl-z', or 'x' ");
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
+                        if (redoRecord.Count == 0)
+                        {
+                            WriteLine("Invalid value. Valid values for 'From': '1', '2', '3', 'Ctrl-z', or 'x' ");
+                        }
+                        else
+                        {
+                            WriteLine("Invalid value. Valid values for 'From': '1', '2', '3', 'Ctrl-z', 'Ctrl-y' or 'x' ");
+                        }
+                        Console.ResetColor();                        
                         foundFrom = false;
                     }
                     else
@@ -289,7 +300,16 @@ namespace TowersUI
                 }
                 else
                 {
-                    WriteLine("Invalid value. Valid values for 'From': '1', '2', '3', 'Ctrl-z', or 'x' ");
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    if (redoRecord.Count == 0)
+                    {
+                        WriteLine("Invalid value. Valid values for 'From': '1', '2', '3', 'Ctrl-z', or 'x' ");
+                    }
+                    else
+                    {
+                        WriteLine("Invalid value. Valid values for 'From': '1', '2', '3', 'Ctrl-z', 'Ctrl-y' or 'x' ");
+                    }
+                    Console.ResetColor();
                     foundFrom = false;
                 }
             } while (!foundFrom);
@@ -303,7 +323,9 @@ namespace TowersUI
                 {
                     if (to < 1 || to > 3)
                     {
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
                         WriteLine("Invalid tower value. Valid values for 'To': '1', '2', '3', or enter");
+                        Console.ResetColor();
                         foundTo = false;
                     }
                     else
@@ -319,7 +341,9 @@ namespace TowersUI
                 }
                 else
                 {
-                    WriteLine("Invalid input.");
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    WriteLine("Invalid tower value. Valid values for 'To': '1', '2', '3', or enter");
+                    Console.ResetColor();
                     foundTo = false;
                 }
             } while (!foundTo);
@@ -333,7 +357,9 @@ namespace TowersUI
             MoveRecord nextRecord;
             if (redoRecord.Count == 0)
             {
+                Console.ForegroundColor = ConsoleColor.DarkRed;
                 WriteLine("Invalid value. Valid values for 'From': '1', '2', '3', 'Ctrl-z', or 'x' ");
+                Console.ResetColor();                 
             }
             else
             {
@@ -353,7 +379,9 @@ namespace TowersUI
             MoveRecord nextRecord; 
             if (undoRecord.Count == 0)
             {
+                Console.ForegroundColor = ConsoleColor.DarkRed;
                 WriteLine("Can’t undo");
+                Console.ResetColor();                
             }
             else
             {
@@ -401,7 +429,9 @@ namespace TowersUI
                     }
                     catch (InvalidMoveException e)
                     {
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
                         WriteLine(e.Message);
+                        Console.ResetColor();                        
                     }
                 }
 
@@ -450,7 +480,9 @@ namespace TowersUI
                         else if (input != "Y" && input != "N")
                         {
                             WriteLine();
+                            Console.ForegroundColor = ConsoleColor.DarkRed;
                             WriteLine("Invalid value. Valid values: 'Y', or 'N'");
+                            Console.ResetColor();                            
                             WriteLine();
                         }
                     } while (input != "Y" && input != "N");
@@ -516,15 +548,16 @@ namespace TowersUI
                         WriteLine();
                         do
                         {
-                            Write("Enter the number of the move (Please press enter key after entering the value): ");
+                            Write("Enter the number of the move (Please press 'enter' key after entering the value): ");
                             if (Int32.TryParse(ReadLine(), out moveNum))
                             {
-                                done = true; 
-                                WriteLine();
+                                done = true;                                 
                                 theRecord = moves.Find(moveNum);
                                 if (theRecord == null)
                                 {
+                                    Console.ForegroundColor = ConsoleColor.DarkRed;
                                     WriteLine("No such move.");
+                                    Console.ResetColor(); 
                                 }
                                 else
                                 {
@@ -536,8 +569,9 @@ namespace TowersUI
                             }
                             else
                             {
-                                WriteLine();
+                                Console.ForegroundColor = ConsoleColor.DarkRed;
                                 WriteLine("Invalid value. Values should be integers.");
+                                Console.ResetColor(); 
                             }
                         } while (!done); 
                         
@@ -545,7 +579,9 @@ namespace TowersUI
                     case "X":
                         break;
                     default:
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
                         WriteLine("Invalid command.");
+                        Console.ResetColor(); 
                         break;
                 }
             } while (input != "X");
@@ -571,7 +607,9 @@ namespace TowersUI
                 else
                 {
                     WriteLine();
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
                     WriteLine("Invalid value. Valid values: 'Y', or 'N'");
+                    Console.ResetColor();
                     WriteLine();
                 }
             } while (input != "Y" && input != "N");
@@ -625,14 +663,18 @@ namespace TowersUI
                         }
                         catch (InvalidHeightException e)
                         {
+                            Console.ForegroundColor = ConsoleColor.DarkRed;
                             WriteLine(e.Message);
+                            Console.ResetColor();
                             done = false;
                             WriteLine();
                         }
                     }
                     else
                     {
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
                         WriteLine("Oops, that input is invalid. Please try again.");
+                        Console.ResetColor(); 
                         done = false;
                         WriteLine();
                     }
