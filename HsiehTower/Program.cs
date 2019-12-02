@@ -519,12 +519,15 @@ namespace TowersUI
             {
                 WriteLine(); 
                 WriteLine("Post-game review:");
+                WriteLine();
                 WriteLine("- L – List moves");
                 WriteLine("- R - Replay");
                 WriteLine("- B – Replay backwards");
                 WriteLine("- F – Find result of a specific move");
+                WriteLine();
                 WriteLine("- X – Exit post-game review");
-                Write("Choose an approach: ");
+                WriteLine();
+                Write("Choose an option: ");
                 input = ReadKey().KeyChar.ToString().ToUpper();
                 WriteLine();
                 switch (input)
@@ -539,16 +542,20 @@ namespace TowersUI
                         });                        
                         break;
                     case "R":
+                        Console.Clear();
+                        WriteLine("<<< REPLAY >>>");
                         moves.Traverse(MoveWithStateDisplay);
                         break;
                     case "B":
+                        Console.Clear();
+                        WriteLine("<<< REPLAY >>>");
                         moves.TraverseReverse(MoveWithStateDisplay);
                         break;
                     case "F":
                         WriteLine();
                         do
                         {
-                            Write("Enter the number of the move (Please press 'enter' key after entering the value): ");
+                            Write("Enter move number (Please press 'enter' key after entering the value): ");
                             if (Int32.TryParse(ReadLine(), out moveNum))
                             {
                                 done = true;                                 
@@ -619,7 +626,6 @@ namespace TowersUI
 
         private static void MoveWithStateDisplay(MoveRecord theRecord)
         {
-            Console.Clear();
             DisplayTowers(theRecord.TowerState);
             WriteLine();
             if (theRecord.MoveNumber == 0)
