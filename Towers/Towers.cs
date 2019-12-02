@@ -5,8 +5,6 @@ using System.Runtime.Serialization;
 public class Towers
 {
     private readonly Stack<int>[] threePoles = new Stack<int>[3];
-
-    // private readonly Stack<int> thePole = new Stack<int>();
     public int NumberOfDiscs { get; private set; }
     public int NumberOfMoves { get; private set; }
 
@@ -15,7 +13,6 @@ public class Towers
 
     public int MinimumPossibleMoves { get; set; }
 
-    //public MoveRecord initial;
     public Towers(Towers copied)
     {
         this.threePoles = new Stack<int>[3];           // ref data type
@@ -26,13 +23,10 @@ public class Towers
             this.threePoles[i] = new Stack<int>(this.threePoles[i]);
         }
         
-        // copied.threePoles.Clone();
-        // this.thePole = copied.thePole;
         this.NumberOfDiscs = copied.NumberOfDiscs;
         this.NumberOfMoves = copied.NumberOfMoves;
         this.IsComplete = copied.IsComplete;
         this.MinimumPossibleMoves = copied.MinimumPossibleMoves;
-        //this.initial = new MoveRecord(0, 0, 0, 0, new Towers(this));
     }
     public Towers(int numberOfDiscs)
     {
@@ -46,11 +40,6 @@ public class Towers
             }
             threePoles[1] = new Stack<int>();
             threePoles[2] = new Stack<int>();
-            // thePole = new Stack<int>();
-            //for (int i = numberOfDiscs; i > 0; i--)
-            //{
-            //    thePole.Push(i);
-            //}
             NumberOfMoves = 0;
             IsComplete = false;
             MinimumPossibleMoves = (int)Math.Pow(2, NumberOfDiscs) - 1;

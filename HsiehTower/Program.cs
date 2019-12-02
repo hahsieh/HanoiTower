@@ -9,11 +9,9 @@ namespace TowersUI
 {
     class Program
     {
-        static readonly AVL<int, MoveRecord> moves = new AVL<int, MoveRecord> { };          // ??
-        static readonly Queue<MoveRecord> myRecord = new Queue<MoveRecord> { };
+        static readonly AVL<int, MoveRecord> moves = new AVL<int, MoveRecord> { };          
         static readonly Stack<MoveRecord> undoRecord = new Stack<MoveRecord> { };
-        static readonly Stack<MoveRecord> redoRecord = new Stack<MoveRecord> { };
-        //static MoveRecord initialRecord;
+        static readonly Stack<MoveRecord> redoRecord = new Stack<MoveRecord> { };        
         const string CtrlZ = "\u001a";
         const string CtrlY = "\u0019";
 
@@ -23,7 +21,6 @@ namespace TowersUI
             int mode;
 
             GetTower(out myTowers);
-            //initialRecord = new MoveRecord(0, 0, 0, 0, new Towers(myTowers));
             moves.Insert(0, new MoveRecord(0, 0, 0, 0, new Towers(myTowers)));
             
             Console.Clear();
@@ -33,7 +30,6 @@ namespace TowersUI
 
             while (mode != 0)
             {
-                //myRecord.Clear();
                 moves.Clear();
                 undoRecord.Clear();
                 redoRecord.Clear();
@@ -41,10 +37,12 @@ namespace TowersUI
                 {
                     Console.Clear();
                     GetTower(out myTowers);
+                    moves.Insert(0, new MoveRecord(0, 0, 0, 0, new Towers(myTowers)));
                 }
                 else if (mode == 2)
                 {
                     myTowers = new Towers(myTowers.NumberOfDiscs);
+                    moves.Insert(0, new MoveRecord(0, 0, 0, 0, new Towers(myTowers)));
                 }
                 Console.Clear();
                 DisplayTowers(myTowers);
@@ -162,7 +160,6 @@ namespace TowersUI
 
                         theRecord = myTowers.Move(to, from);
                     }
-                    // myRecord.Enqueue(theRecord);
                     moves.Insert(myTowers.NumberOfMoves, theRecord);
                 }
                 else if (i % 3 == 2)
@@ -176,7 +173,6 @@ namespace TowersUI
 
                         theRecord = myTowers.Move(other, from);
                     }
-                    // myRecord.Enqueue(theRecord);
                     moves.Insert(myTowers.NumberOfMoves, theRecord);
                 }
                 else if (i % 3 == 0)
@@ -190,7 +186,6 @@ namespace TowersUI
 
                         theRecord = myTowers.Move(other, to);
                     }
-                    // myRecord.Enqueue(theRecord);
                     moves.Insert(myTowers.NumberOfMoves, theRecord);
                 }
 
@@ -215,7 +210,6 @@ namespace TowersUI
             if (n == 1)
             {
                 theRecord = myTowers.Move(from, to);
-                //myRecord.Enqueue(theRecord);
                 moves.Insert(myTowers.NumberOfMoves, theRecord);
                 Console.Clear();
                 DisplayTowers(myTowers);
@@ -226,7 +220,6 @@ namespace TowersUI
 
             Recursive(myTowers, n - 1, from, other, to);
             theRecord = myTowers.Move(from, to);
-            //myRecord.Enqueue(theRecord);
             moves.Insert(myTowers.NumberOfMoves, theRecord);
             Console.Clear();
             DisplayTowers(myTowers);
@@ -346,7 +339,6 @@ namespace TowersUI
             {
                 theRecord = redoRecord.Pop();
                 undoRecord.Push(theRecord);
-                //myRecord.Enqueue(myTowers.Move(theRecord.From, theRecord.To));
                 nextRecord = myTowers.Move(theRecord.From, theRecord.To);
                 moves.Insert(myTowers.NumberOfMoves, nextRecord);
                 Console.Clear();
@@ -367,7 +359,6 @@ namespace TowersUI
             {
                 theRecord = undoRecord.Pop();
                 redoRecord.Push(theRecord);
-                //myRecord.Enqueue(myTowers.Move(theRecord.To, theRecord.From));
                 nextRecord = myTowers.Move(theRecord.To, theRecord.From);
                 moves.Insert(myTowers.NumberOfMoves, nextRecord);
                 Console.Clear();
@@ -401,8 +392,7 @@ namespace TowersUI
                     try
                     {
                         theRecord = myTowers.Move(from, to);
-                        //myRecord.Enqueue(theRecord);
-                        moves.Insert(myTowers.NumberOfMoves, theRecord);    // theRecord.MoveNumber
+                        moves.Insert(theRecord.MoveNumber, theRecord);    
                         undoRecord.Push(theRecord);
                         redoRecord.Clear();
                         Console.Clear();
@@ -517,22 +507,17 @@ namespace TowersUI
                         });                        
                         break;
                     case "R":
-                        //Console.Clear();
-                        //DisplayTowers(myTowers.initial.TowerState);
-                        //Thread.Sleep(250);
                         moves.Traverse(MoveWithStateDisplay);
                         break;
                     case "B":
                         moves.TraverseReverse(MoveWithStateDisplay);
-                        //Console.Clear();
-                        //DisplayTowers(myTowers.initial.TowerState);
                         break;
                     case "F":
                         WriteLine();
                         do
                         {
-                            Write("Enter the number of the move: ");
-                            if (Int32.TryParse(ReadKey().KeyChar.ToString(), out moveNum))
+                            Write("Enter the number of the move (Please press enter key after entering the value): ");
+                            if (Int32.TryParse(ReadLine(), out moveNum))
                             {
                                 done = true; 
                                 WriteLine();

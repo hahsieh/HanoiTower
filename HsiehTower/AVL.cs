@@ -1,5 +1,4 @@
 ﻿using System;
-using static System.Console;
 
 public class AVL<TKey, TValue> where TKey : IComparable  // whatever data type is substituted for TKey can handle comparison operations
 {
@@ -9,7 +8,6 @@ public class AVL<TKey, TValue> where TKey : IComparable  // whatever data type i
         public TValue Value;
         public Node Left;
         public Node Right;
-
     }
 
     internal Node Root;
@@ -167,7 +165,7 @@ public class AVL<TKey, TValue> where TKey : IComparable  // whatever data type i
 
     private TValue Find(Node node, int key)
     {
-        if (node == null) return default(TValue);                      //??
+        if (node == null) return default(TValue); // return null if nothing is found.
 
         if (key.CompareTo(node.Key) == 0) return node.Value;
 
